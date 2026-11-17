@@ -69,7 +69,7 @@ function drawBackground(ctx, t) {
   ctx.fillRect(0, 0, FIELD_W, FIELD_H);
 
   // Faint garden paths / tiles.
-  ctx.strokeStyle = 'rgba(58,68,112,0.35)';
+  ctx.strokeStyle = 'rgba(58,68,112,0.5)';
   ctx.lineWidth = 1;
   for (let x = 80; x < FIELD_W; x += 160) {
     ctx.beginPath();
@@ -284,7 +284,7 @@ function drawDarkness(ctx, world) {
   const dc = getDarkCanvas();
   const dctx = darkCtx;
   dctx.clearRect(0, 0, FIELD_W, FIELD_H);
-  dctx.fillStyle = 'rgba(5,6,20,0.86)';
+  dctx.fillStyle = 'rgba(5,6,20,0.72)';
   dctx.fillRect(0, 0, FIELD_W, FIELD_H);
   dctx.globalCompositeOperation = 'destination-out';
   const lr = lightRadius(world);

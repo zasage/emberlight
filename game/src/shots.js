@@ -140,23 +140,23 @@ function strongInput(world) {
   return { mx, my, aimX, aimY, pulse };
 }
 
-// Passive autopilot for the 'end' shot: wanders after embers, never
-// pulses, never dodges — the shadows catch up with it eventually.
+// Passive autopilot for the 'end' shot: it wanders slowly, never pulses,
+// never chases embers (so its light never grows), and takes the weakest
+// upgrades first — the shadows catch up with it every time.
+const DOOMED_PRIORITY = [
+  'thorn-ring',
+  'swift-boots',
+  'ember-magnet',
+  'swift-pulse',
+  'wider-light',
+  'extra-heart',
+];
+
 function passiveInput(world) {
   const p = world.player;
-  const nearEmber = nearest(world.embersList, p.x, p.y);
-  let mx = 0;
-  let my = 0;
-  if (nearEmber.item) {
-    const dx = nearEmber.item.x - p.x;
-    const dy = nearEmber.item.y - p.y;
-    const d = Math.hypot(dx, dy) || 1;
-    mx = (dx / d) * 0.5;
-    my = (dy / d) * 0.5;
-  } else {
-    mx = Math.sin(world.time * 0.4) * 0.4;
-    my = Math.cos(world.time * 0.33) * 0.4;
-  }
+  // Slow aimless wander: drift in a small circle, never toward embers.
+  const mx = Math.sin(world.time * 0.4) * 0.35;
+  const my = Math.cos(world.time * 0.33) * 0.35;
   const nearEnemy = nearest(world.enemies, p.x, p.y);
   const aimX = nearEnemy.item ? nearEnemy.item.x : p.x + 100;
   const aimY = nearEnemy.item ? nearEnemy.item.y : p.y;
@@ -193,10 +193,27 @@ export function stageShot(name, world) {
 
   if (name === 'play') {
     startGame(world);
-    runSteps(world, strongInput, 26);
-    // If wave 2 happened to clear on the last step, pick the upgrade so
-    // the captured screen is gameplay, not the upgrade interstitial.
-    if (world.screen === SCREEN_UPGRADE) {
+    // Play until the garden is busy (many shadows and embers on screen) so
+    // the captured frame reads at a glance; fall back to 48 s if it never is.
+    const cap = Math.round(150 / STEP);
+    let played = 0;
+    let busy = false;
+    for (let i = 0; i < cap; i++) {
+      if (world.screen === SCREEN_UPGRADE) {
+        applyUpgradeChoice(world, UPGRADE_PRIORITY);
+      }
+      step(world, STEP, strongInput(world));
+      played += STEP;
+      if (world.screen === SCREEN_OVER || world.screen === SCREEN_WIN) break;
+      if (
+        played >= 35 && i % 30 === 0 && world.screen === SCREEN_PLAY
+        && world.enemies.length >= 8 && world.embersList.length >= 2
+      ) {
+        busy = true;
+        break;
+      }
+    }
+    if (!busy && world.screen === SCREEN_UPGRADE) {
       applyUpgradeChoice(world, UPGRADE_PRIORITY);
       step(world, STEP, strongInput(world));
     }
@@ -207,7 +224,7 @@ export function stageShot(name, world) {
     startGame(world);
     const cap = Math.round(600 / STEP);
     for (let i = 0; i < cap; i++) {
-      if (world.screen === SCREEN_UPGRADE) applyUpgradeChoice(world, UPGRADE_PRIORITY);
+      if (world.screen === SCREEN_UPGRADE) applyUpgradeChoice(world, DOOMED_PRIORITY);
       step(world, STEP, passiveInput(world));
       if (world.screen === SCREEN_OVER) break;
     }
