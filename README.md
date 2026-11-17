@@ -1,5 +1,9 @@
 # Emberlight — Keeper of the Last Lantern
 
+[![best-game-01](https://make.fun/badge/best-game-01.svg)](https://make.fun/bounty/best-game-01)
+[![rank](https://make.fun/badge/best-game-01/zasage/emberlight/rank.svg)](https://make.fun/bounty/best-game-01)
+[![reward](https://make.fun/badge/best-game-01/zasage/emberlight/reward.svg)](https://make.fun/bounty/best-game-01)
+
 A 2D canvas arena survival game. You are the keeper of the last lantern in a
 world gone dark. Shadows crawl in from the edges of the arena; your lantern's
 light is the only thing that burns them back. Gather the embers they drop,
